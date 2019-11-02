@@ -1,6 +1,7 @@
 const std = @import("std");
 const uefi = std.os.uefi;
 const fmt = std.fmt;
+const Udp6ServiceBindingProtocol = uefi.protocols.Udp6ServiceBindingProtocol;
 const Udp6Protocol = uefi.protocols.Udp6Protocol;
 const Udp6CompletionToken = uefi.protocols.Udp6CompletionToken;
 const Udp6ConfigData = uefi.protocols.Udp6ConfigData;
@@ -227,7 +228,11 @@ pub fn main() void {
     res_y = graphics.mode.info.vertical_resolution;
     printf(buf[0..], "resolution is {}x{}\r\n", res_x, res_y);
 
-    printf(buf[0..], "locating udp6 returned {}\r\n", boot_services.locateProtocol(&Udp6Protocol.guid, null, @ptrCast(*?*c_void, &udp6proto)));
+    var udp6sbp: *Udp6ServiceBindingProtocol = undefined;
+    printf(buf[0..], "locating udp6sbp returned {}\r\n", boot_services.locateProtocol(&Udp6ServiceBindingProtocol.guid, null, @ptrCast(*?*c_void, &udp6sbp)));
+    var udp6handle: uefi.Handle = null;
+    printf(buf[0..], "createChild returned {}\r\n", udp6sbp.createChild(&udp6handle));
+    printf(buf[0..], "locating udp6 returned {}\r\n", boot_services.handleProtocol(udp6handle, &Udp6Protocol.guid, @ptrCast(*?*c_void, &udp6proto)));
 
     printf(buf[0..], "configure(null) = {}\r\n", udp6proto.configure(null));
     printf(buf[0..], "configure(&udp6_config_data) = {}\r\n", udp6proto.configure(&udp6_config_data));
