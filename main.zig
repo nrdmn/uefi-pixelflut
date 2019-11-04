@@ -27,6 +27,13 @@ const udp6_config_data = Udp6ConfigData{
 const preferred_res_x: u32 = 1920;
 const preferred_res_y: u32 = 1080;
 
+const Pixel = extern struct {
+    blue: u8,
+    green: u8,
+    red: u8,
+    pad: u8 = undefined,
+};
+
 var boot_services: *uefi.tables.BootServices = undefined;
 var udp6proto: *Udp6Protocol = undefined;
 var graphics: *GraphicsOutputProtocol = undefined;
@@ -52,7 +59,7 @@ extern fn draw(event: uefi.Event, context: ?*c_void) void {
         if (buf.len >= 13 and buf[0] == 'P' and buf[1] == 'X' and buf[2] == ' ') {
             var x: ?u32 = null;
             var y: ?u32 = null;
-            var color = GraphicsOutputBltPixel{
+            var color = Pixel{
                 .red = undefined,
                 .green = undefined,
                 .blue = undefined,
@@ -198,7 +205,7 @@ extern fn draw(event: uefi.Event, context: ?*c_void) void {
             }
 
             if (state == .Done) {
-                _ = graphics.blt(@ptrCast([*]GraphicsOutputBltPixel, &color), GraphicsOutputBltOperation.BltVideoFill, 0, 0, x.?, y.?, 1, 1, 0);
+                @intToPtr([*]Pixel, graphics.mode.frame_buffer_base)[x.? + y.? * res_x] = color;
             }
         }
     }
