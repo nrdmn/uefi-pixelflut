@@ -10,7 +10,7 @@ const GraphicsOutputBltPixel = uefi.protocols.GraphicsOutputBltPixel;
 const GraphicsOutputBltOperation = uefi.protocols.GraphicsOutputBltOperation;
 const GraphicsOutputModeInformation = uefi.protocols.GraphicsOutputModeInformation;
 
-const udp6_config_data = Udp6ConfigData {
+const udp6_config_data = Udp6ConfigData{
     .accept_promiscuous = false,
     .accept_any_port = false,
     .allow_duplicate_port = false,
@@ -18,9 +18,9 @@ const udp6_config_data = Udp6ConfigData {
     .hop_limit = 255,
     .receive_timeout = 0,
     .transmit_timeout = 0,
-    .station_address = [_]u8{ 0 } ** 16,
+    .station_address = [_]u8{0} ** 16,
     .station_port = 1337,
-    .remote_address = [_]u8{ 0 } ** 16,
+    .remote_address = [_]u8{0} ** 16,
     .remote_port = 1337,
 };
 
@@ -58,25 +58,25 @@ extern fn draw(event: uefi.Event, context: ?*c_void) void {
                 .blue = undefined,
             };
             var state: enum {
-                    Width,
-                    Height,
-                    Red1,
-                    Red2,
-                    Green1,
-                    Green2,
-                    Blue1,
-                    Blue2,
-                    Error,
-                    Done,
+                Width,
+                Height,
+                Red1,
+                Red2,
+                Green1,
+                Green2,
+                Blue1,
+                Blue2,
+                Error,
+                Done,
             } = .Width;
             for (buf[3..]) |c| {
                 switch (state) {
                     .Width => switch (c) {
                         ' ' => if (x != null) {
-                                state = .Height;
-                            } else {
-                                state = .Error;
-                            },
+                            state = .Height;
+                        } else {
+                            state = .Error;
+                        },
                         '0'...'9' => {
                             x = (x orelse 0) * 10 + c - '0';
                             if (x.? >= res_x) {
@@ -87,10 +87,10 @@ extern fn draw(event: uefi.Event, context: ?*c_void) void {
                     },
                     .Height => switch (c) {
                         ' ' => if (y != null) {
-                                state = .Red1;
-                            } else {
-                                state = .Error;
-                            },
+                            state = .Red1;
+                        } else {
+                            state = .Error;
+                        },
                         '0'...'9' => {
                             y = (y orelse 0) * 10 + c - '0';
                             if (y.? >= res_y) {
